@@ -73,8 +73,17 @@
     <Compile Include="Prefs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="deps\0Harmony.dll" />
+    <Content Include="deps\Aki.Reflection.dll" />
+    <Content Include="deps\Assembly-CSharp.dll" />
+    <Content Include="deps\BepInEx.dll" />
+    <Content Include="deps\Comfort.dll" />
+    <Content Include="deps\UnityEngine.CoreModule.dll" />
+    <Content Include="deps\UnityEngine.dll" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy $(TargetPath) "D:\Games\SPT Tarkov\=sptarkov\BepInEx\plugins\"</PostBuildEvent>
+    <PostBuildEvent>$(ProjectDir)copy_build.bat $(TargetPath)</PostBuildEvent>
   </PropertyGroup>
 </Project>
