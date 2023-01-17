@@ -5,20 +5,40 @@ namespace LegDay
 {
     internal static class Prefs
     {
-        public static Buff jumpBuff;
-        public static Buff sprintBuff;
+        public static ConfigEntry<bool> buffsEnabled;
+
+        public static Buff[] buffs;
+        //public static Buff jumpBuff;
+        //public static Buff sprintBuff;
 
         public static void Bind(ConfigFile config)
         {
-            jumpBuff = new Buff(config.Bind("LegDay", "JumpBuff", 0f, "Change Jump Strength Buff"), "StrengthBuffJumpHeightInc");
-            sprintBuff = new Buff(config.Bind("LegDay", "SprintBuff", 0f, "Change Sprint Speed Buff"), "StrengthBuffSprintSpeedInc");
+            buffsEnabled = config.Bind("Buffs", "ToggleBuffs", true);
+            buffs = new Buff[]
+            {
+                new Buff(config.Bind("Buffs", "JumpBuff", 0f, "Change Jump Strength Buff"), "StrengthBuffJumpHeightInc"),
+                new Buff(config.Bind("Buffs", "SprintBuff", 0f, "Change Sprint Speed Buff"), "StrengthBuffSprintSpeedInc"),
+            };
         }
 
         public static void FindBuffReferences(SkillsClass skills)
         {
             // @Todo: put all buffs in an array so we can just loop over them
-            jumpBuff.FindReference(skills);
-            sprintBuff.FindReference(skills);
+            //jumpBuff.FindReference(skills);
+            //sprintBuff.FindReference(skills);
+
+            for (int i = 0; i < buffs.Length; i++)
+            {
+                buffs[i].FindReference(skills);
+            }
+        }
+
+        public static void ApplyAllBuffs()
+        {
+            for (int i = 0; i < buffs.Length; i++)
+            {
+                buffs[i].Apply();
+            }
         }
 
         public class Buff
@@ -36,9 +56,9 @@ namespace LegDay
                 entry.SettingChanged += Entry_SettingChanged;
             }
 
-            private void Entry_SettingChanged(object sender, System.EventArgs e)
+            public void Apply()
             {
-                if(reference == null)
+                if (reference == null)
                 {
                     Plugin.Log.LogWarning($"Buff reference ({referenceName}) not found! The mod only works in raid.");
                     return;
@@ -51,6 +71,14 @@ namespace LegDay
             {
                 var info = typeof(SkillsClass).GetField(referenceName, BindingFlags.Public | BindingFlags.Instance);
                 reference = (SkillsClass.GClass1563)info.GetValue(skills);
+            }
+
+            private void Entry_SettingChanged(object sender, System.EventArgs e)
+            {
+                if (!Prefs.buffsEnabled.Value)
+                    return;
+
+                Apply();
             }
         }
     }

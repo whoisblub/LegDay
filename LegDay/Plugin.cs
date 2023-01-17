@@ -5,6 +5,7 @@ using Comfort.Common;
 using BepInEx.Logging;
 using Aki.Reflection.Patching;
 using System.Reflection;
+using BepInEx.Configuration;
 
 namespace LegDay
 {
@@ -12,10 +13,12 @@ namespace LegDay
     internal class Plugin : BaseUnityPlugin
     {
         public static ManualLogSource Log;
+        public static ConfigFile Cfg;
 
         private void Awake()
         {
             Log = base.Logger;
+            Cfg = base.Config;
 
             Prefs.Bind(Config);
             
@@ -40,6 +43,11 @@ namespace LegDay
         {
             Prefs.FindBuffReferences(Singleton<GameWorld>.Instance.AllPlayers[0].Skills);
             Plugin.Log.LogInfo("Found all Player Skill Buffs");
+            
+            if (Prefs.buffsEnabled.Value)
+            {
+                Prefs.ApplyAllBuffs();
+            }
         }
     }
 }
